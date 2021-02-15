@@ -251,7 +251,7 @@ resource helm_release "reflector" {
 
 
 // Namespace for knative-serving
-resource "kubernetes_namespace" "knative-serving" {
+resource "kubernetes_namespace" "knative_serving" {
   metadata {
     labels = {
       "serving.knative.dev/release": "v0.14.3"
@@ -263,6 +263,7 @@ resource "kubernetes_namespace" "knative-serving" {
 
 // knative configmap to point to correct domain
 resource "kubernetes_config_map" "knative_config_map" {
+   depends_on = [kubernetes_namespace.knative_serving]
   metadata {
     name = "config-domain"
     namespace = "knative-serving"
@@ -277,6 +278,7 @@ resource "kubernetes_config_map" "knative_config_map" {
 
 // knative configmap to point to use corret domainTemplate
 resource "kubernetes_config_map" "knative_network_config_map" {
+  depends_on = [kubernetes_namespace.knative_serving]
   metadata {
     name = "config-network"
     namespace = "knative-serving"
