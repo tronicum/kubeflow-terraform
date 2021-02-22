@@ -160,7 +160,7 @@ variable "rds_database_instance" {
 variable "rds_database_username" {
   type        = string
   description = "Database username"
-  default     = "exampleuser"
+  default     = "sa"
 }
 
 variable "rds_database_password" {
