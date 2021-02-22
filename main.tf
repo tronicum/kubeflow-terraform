@@ -130,7 +130,7 @@ EOT
 resource aws_cognito_user_pool_client kubeflow {
   name                                 = "kubeflow"
   user_pool_id                         = module.cognito.pool_id
-  callback_urls                        = ["https://${var.cognito_callback_prefix_kubeflow}.${[var.domain]}/oauth2/idpresponse"]
+  callback_urls                        = ["https://${var.cognito_callback_prefix_kubeflow}.${var.domain}/oauth2/idpresponse"]
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_scopes                 = ["email", "openid", "profile", "aws.cognito.signin.user.admin"]
   allowed_oauth_flows                  = ["code"]
@@ -144,7 +144,7 @@ resource aws_cognito_user_pool_client argocd {
   //TODO shouldn't this go to a separate user pool?
   name                                 = "argocd"
   user_pool_id                         = module.cognito.pool_id
-  callback_urls                        = ["https://${var.cognito_callback_prefix_argocd}.${[var.domain]}/auth/callback"]
+  callback_urls                        = ["https://${var.cognito_callback_prefix_argocd}.${var.domain}/auth/callback"]
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_scopes                 = ["openid", "profile", "email"]
   allowed_oauth_flows                  = ["code"]
