@@ -100,8 +100,8 @@ module acm {
   source  = "terraform-aws-modules/acm/aws"
   version = "~> v2.0"
 
-  domain_name               = var.domains[0]
-  subject_alternative_names = ["*.${var.domains[0]}"]
+  domain_name               = var.domain
+  subject_alternative_names = ["*.${var.domain}"]
   zone_id                   = module.external_dns.zone_id
   validate_certificate      = var.aws_private == "false" ? true : false
   tags                      = var.tags
@@ -130,7 +130,7 @@ EOT
 resource aws_cognito_user_pool_client kubeflow {
   name                                 = "kubeflow"
   user_pool_id                         = module.cognito.pool_id
-  callback_urls                        = ["https://${var.cognito_callback_prefix_kubeflow}.${var.domains[0]}/oauth2/idpresponse"]
+  callback_urls                        = ["https://${var.cognito_callback_prefix_kubeflow}.${[var.domain]}/oauth2/idpresponse"]
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_scopes                 = ["email", "openid", "profile", "aws.cognito.signin.user.admin"]
   allowed_oauth_flows                  = ["code"]
@@ -144,7 +144,7 @@ resource aws_cognito_user_pool_client argocd {
   //TODO shouldn't this go to a separate user pool?
   name                                 = "argocd"
   user_pool_id                         = module.cognito.pool_id
-  callback_urls                        = ["https://${var.cognito_callback_prefix_argocd}.${var.domains[0]}/auth/callback"]
+  callback_urls                        = ["https://${var.cognito_callback_prefix_argocd}.${[var.domain]}/auth/callback"]
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_scopes                 = ["openid", "profile", "email"]
   allowed_oauth_flows                  = ["code"]
@@ -300,7 +300,7 @@ module argocd {
   owner         = var.argocd_owner
   repository    = var.argocd_repository
   cluster_name  = module.kubernetes.cluster_name
-  domains       = var.domains
+  domains       = [var.domain]
   chart_version = "2.7.4"
   oidc = {
     secret = aws_cognito_user_pool_client.argocd.client_secret
@@ -370,7 +370,7 @@ module kubeflow {
       [{ "HTTPS" = 443 }]
     )
   }
-  domain = "kubeflow.${var.domains[0]}"
+  domain = "kubeflow.${var.domain}"
   argocd = module.argocd.state
 
 
@@ -472,7 +472,7 @@ module cert_manager {
   module_depends_on = [module.kubernetes]
   source            = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/system/cert-manager?ref=v1.0.0"
   cluster_name      = module.kubernetes.cluster_name
-  domains           = var.domains
+  domains           = [var.domain]
   vpc_id            = module.network.vpc_id
   environment       = var.environment
   project           = var.project
@@ -487,7 +487,7 @@ module alb_ingress {
   module_depends_on = [module.kubernetes]
   source            = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/ingress/aws-alb?ref=v1.0.0"
   cluster_name      = module.kubernetes.cluster_name
-  domains           = var.domains
+  domains           = [var.domain]
   vpc_id            = module.network.vpc_id
   certificates_arns = [module.acm.this_acm_certificate_arn]
   argocd            = module.argocd.state
@@ -499,8 +499,8 @@ module external_dns {
   cluster_name = module.kubernetes.cluster_name
   vpc_id       = module.network.vpc_id
   aws_private  = var.aws_private
-  hostedzones  = var.domains
-  mainzoneid   = var.mainzoneid
+  hosted_zone_domain      = var.root_domain
+  hosted_zone_subdomain   = var.create_route_53_subdomain ? var.hosted_zone_subdomain : null
   argocd       = module.argocd.state
   tags         = var.tags
 }
