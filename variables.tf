@@ -88,7 +88,8 @@ variable kubeflow_cognito_users {
 }
 
 variable aws_private {
-  type = string
+  type = bool
+  default = false
 }
 
 variable aws_auth_user_mapping {

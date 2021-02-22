@@ -108,7 +108,7 @@ module acm {
   domain_name               = var.domain
   subject_alternative_names = ["*.${var.domain}"]
   zone_id                   = module.external_dns.zone_id
-  validate_certificate      = var.aws_private == "false" ? true : false
+  validate_certificate      = var.aws_private == false ? true : false
   tags                      = var.tags
 }
 
