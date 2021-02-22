@@ -167,7 +167,7 @@ module cognito_users {
 
 // Create RDS instance
 module "rds" {
-  source  = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/rds?ref=v1.0.0"
+  source  = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/rds?ref=feature/rds_user"
 
   environment  = var.environment
   project      = var.project
@@ -192,8 +192,9 @@ module "rds" {
   rds_database_delete_protection = var.rds_database_delete_protection
   rds_enabled_cloudwatch_logs_exports = var.rds_enabled_cloudwatch_logs_exports
   rds_database_tags = var.rds_database_tags
+  rds_database_username = var.rds_database_username
+  rds_database_password = var.rds_database_password
 }
-
 
 
 // Create S3 bucket
