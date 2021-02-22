@@ -495,7 +495,7 @@ module alb_ingress {
 
 // Create YAML specs for External DNS
 module external_dns {
-  source       = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/system/external-dns?ref=v1.0.0"
+  source       = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/system/external-dns?ref=feature/hosted_zone"
   cluster_name = module.kubernetes.cluster_name
   vpc_id       = module.network.vpc_id
   aws_private  = var.aws_private
