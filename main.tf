@@ -9,8 +9,11 @@ module network {
   tags               = var.tags
 }
 
-locals {
-  vpc_id = var.vpc_id == null ? module.network.vpc_id : var.vpc_id
+
+
+locals  {
+  vpc_id = var.vpc_id == null ? module.network[0].vpc.vpc_id : var.vpc_id
+  private_subnets = var.vpc_id == null ? module.network[0].vpc.private_subnets : var.private_subnets
 }
 
 
@@ -47,8 +50,8 @@ module kubernetes {
   project            = var.project
   cluster_name       = var.cluster_name
   cluster_version    = var.kubernetes_version
-  vpc_id             = module.network.vpc_id
-  subnets            = module.network.private_subnets
+  vpc_id             = local.vpc_id
+  subnets            = local.private_subnets
   aws_auth_user_mapping    = var.aws_auth_user_mapping
   aws_auth_role_mapping    = var.aws_auth_role_mapping
   wait_for_cluster_interpreter = ["/bin/bash", "-c"]
@@ -178,8 +181,8 @@ module "rds" {
   project      = var.project
   cluster_name = module.kubernetes.cluster_name
 
-  vpc_id = module.network.vpc.vpc_id
-  subnets =  module.network.vpc.private_subnets
+  vpc_id = local.vpc_id
+  subnets =  local.private_subnets
   worker_security_group_id = module.kubernetes.worker_security_group_id
 
   
@@ -478,7 +481,7 @@ module cert_manager {
   source            = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/system/cert-manager?ref=v1.0.1"
   cluster_name      = module.kubernetes.cluster_name
   domains           = [var.domain]
-  vpc_id            = module.network.vpc_id
+  vpc_id            = local.vpc_id
   environment       = var.environment
   project           = var.project
   zone_id           = module.external_dns.zone_id
@@ -493,7 +496,7 @@ module alb_ingress {
   source            = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/ingress/aws-alb?ref=v1.0.1"
   cluster_name      = module.kubernetes.cluster_name
   domains           = [var.domain]
-  vpc_id            = module.network.vpc_id
+  vpc_id            = local.vpc_id
   certificates_arns = [module.acm.this_acm_certificate_arn]
   argocd            = module.argocd.state
 }
@@ -502,7 +505,7 @@ module alb_ingress {
 module external_dns {
   source       = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/system/external-dns?ref=v1.0.1"
   cluster_name = module.kubernetes.cluster_name
-  vpc_id       = module.network.vpc_id
+  vpc_id       = local.vpc_id
   aws_private  = var.aws_private
   hosted_zone_domain      = var.root_domain
   hosted_zone_subdomain   = var.create_route_53_subdomain ? var.domain : null

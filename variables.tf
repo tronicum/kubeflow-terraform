@@ -29,6 +29,15 @@ variable vpc_id {
   default = null
 }
 
+variable private_subnets {
+  type = list
+  description = "A list of private subnets within the existing VPC"
+  default = null
+}
+
+
+
+
 
 variable aws_account {
   type = string
@@ -105,10 +114,6 @@ variable cert_manager_email {
 }
 
 variable kubernetes_version {
-  type = string
-}
-
-variable mainzoneid {
   type = string
 }
 
