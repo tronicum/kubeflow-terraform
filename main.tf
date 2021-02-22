@@ -192,8 +192,9 @@ module "rds" {
   rds_database_delete_protection = var.rds_database_delete_protection
   rds_enabled_cloudwatch_logs_exports = var.rds_enabled_cloudwatch_logs_exports
   rds_database_tags = var.rds_database_tags
+  rds_database_username = var.rds_database_username
+  rds_database_password = var.rds_database_password
 }
-
 
 
 // Create S3 bucket
