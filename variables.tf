@@ -22,6 +22,23 @@ variable domain {
   type = string
 }
 
+
+variable vpc_id {
+  type = string
+  description = "The ID of an existing VPC to reuse"
+  default = null
+}
+
+variable private_subnets {
+  type = list
+  description = "A list of private subnets within the existing VPC"
+  default = null
+}
+
+
+
+
+
 variable aws_account {
   type = string
 }
@@ -80,7 +97,8 @@ variable kubeflow_cognito_users {
 }
 
 variable aws_private {
-  type = string
+  type = bool
+  default = false
 }
 
 variable aws_auth_user_mapping {
@@ -96,10 +114,6 @@ variable cert_manager_email {
 }
 
 variable kubernetes_version {
-  type = string
-}
-
-variable mainzoneid {
   type = string
 }
 
