@@ -1,11 +1,4 @@
 
-provider "mysql" {
-  endpoint = module.rds.this_db_instance_endpoint
-  username = module.rds.this_db_instance_username
-  password = module.rds.this_db_instance_password
-}
-
-
 data aws_eks_cluster cluster {
   name = module.kubernetes.cluster_name
 }

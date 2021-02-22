@@ -11,6 +11,12 @@ variable root_domain {
   type = string
 }
 
+variable create_route_53_subdomain {
+  type = bool
+  default = true
+}
+
+
 
 variable domain {
   type = string
@@ -83,10 +89,6 @@ variable kubeflow_cognito_users {
 
 variable aws_private {
   type = string
-}
-
-variable domains {
-  type = list
 }
 
 variable aws_auth_user_mapping {
@@ -168,7 +170,7 @@ variable "rds_database_instance" {
 variable "rds_database_username" {
   type        = string
   description = "Database username"
-  default     = "exampleuser"
+  default     = "sa"
 }
 
 variable "rds_database_password" {
