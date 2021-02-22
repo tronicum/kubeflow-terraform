@@ -16,6 +16,14 @@ variable domain {
   type = string
 }
 
+
+variable vpc_id {
+  type = string
+  description = "The ID of an existing VPC to reuse"
+  default = null
+}
+
+
 variable aws_account {
   type = string
 }
