@@ -500,7 +500,7 @@ module external_dns {
   vpc_id       = module.network.vpc_id
   aws_private  = var.aws_private
   hosted_zone_domain      = var.root_domain
-  hosted_zone_subdomain   = var.create_route_53_subdomain ? var.hosted_zone_subdomain : null
+  hosted_zone_subdomain   = var.create_route_53_subdomain ? var.subdomain : null
   argocd       = module.argocd.state
   tags         = var.tags
 }
