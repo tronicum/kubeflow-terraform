@@ -71,6 +71,17 @@ variable argocd_repo_ssh_private_key {
   default = ""
 }
 
+variable argocd_repo_https_username {
+  type = string
+  default = ""
+}
+
+variable argocd_repo_https_password {
+  type = string
+  default = ""
+}
+
+
 variable kubeflow_manifests_branch {
   type = string
 }

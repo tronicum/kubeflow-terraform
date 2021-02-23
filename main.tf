@@ -313,6 +313,9 @@ module argocd {
   sync_apps_dir             = var.argocd_apps_dir
   sync_repo_url             = var.argocd_repo_url
   sync_repo_ssh_private_key = var.argocd_repo_ssh_private_key
+  sync_repo_https_username = var.argocd_repo_https_username
+  sync_repo_https_password = var.argocd_repo_https_password
+
 
   cluster_name  = module.kubernetes.cluster_name
   domains       = [var.domain]
