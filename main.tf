@@ -309,12 +309,8 @@ module argocd {
   source                    = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/cicd/argo-cd?ref=feature/argocd_gitlab"
   module_depends_on         = [module.kubernetes]
   sync_branch               = var.argocd_branch
-  sync_owner                = var.argocd_owner
-  sync_repository           = var.argocd_repository
   sync_path_prefix          = var.argocd_path_prefix
   sync_apps_dir             = var.argocd_apps_dir
-  sync_vcs                  = var.argocd_vcs
-  sync_protocol             = var.argocd_protocol
   sync_repo_url             = var.argocd_repo_url
   sync_repo_ssh_private_key = var.argocd_repo_ssh_private_key
 
