@@ -1,6 +1,7 @@
 
 resource "kubernetes_namespace" "mlflow" {
   depends_on = [var.module_depends_on]
+
   metadata {
     labels = {
         "control-plane"   = "kubeflow"
@@ -13,7 +14,7 @@ resource "kubernetes_namespace" "mlflow" {
 
 resource "kubernetes_namespace" "kubeflow" {
   depends_on = [var.module_depends_on]
-  metadata {
+
   metadata {
     labels = {
         "control-plane"   = "kubeflow"
@@ -26,7 +27,7 @@ resource "kubernetes_namespace" "kubeflow" {
 
 resource "kubernetes_namespace" "pipelines" {
   depends_on = [var.module_depends_on]
-  metadata {
+
   metadata {
     labels = {
         "control-plane"   = "kubeflow"
@@ -122,7 +123,6 @@ EOT
 resource "kubernetes_config_map" "aws_storage_ml_pipeline_config" {
   depends_on = [kubernetes_namespace.mlflow, kubernetes_namespace.kubeflow]
 
-
   metadata {
     name = "aws-storage-ml-pipeline-config"
     namespace = "kubeflow"
@@ -186,7 +186,6 @@ EOT
 resource "kubernetes_config_map" "aws_storage_ml_pipeline_ui_config" {
   depends_on = [kubernetes_namespace.mlflow, kubernetes_namespace.kubeflow]
 
-
   metadata {
     name = "aws-storage-ml-pipeline-ui-config"
     namespace = "kubeflow"
@@ -241,7 +240,6 @@ EOT
 
 resource "kubernetes_config_map" "aws_storage_ml_pipeline_ui_viewer_template" {
   depends_on = [kubernetes_namespace.mlflow, kubernetes_namespace.kubeflow]
-
 
   metadata {
     name = "aws-storage-ml-pipeline-viewer-template"
@@ -349,6 +347,6 @@ resource kubernetes_job create_databases {
       }
     }
     backoff_limit = 4
-  }       
+  }
 
 }
