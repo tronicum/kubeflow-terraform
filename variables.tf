@@ -11,10 +11,33 @@ variable root_domain {
   type = string
 }
 
+variable create_route_53_subdomain {
+  type = bool
+  default = true
+}
+
+
 
 variable domain {
   type = string
 }
+
+
+variable vpc_id {
+  type = string
+  description = "The ID of an existing VPC to reuse"
+  default = null
+}
+
+variable private_subnets {
+  type = list
+  description = "A list of private subnets within the existing VPC"
+  default = null
+}
+
+
+
+
 
 variable aws_account {
   type = string
@@ -74,11 +97,8 @@ variable kubeflow_cognito_users {
 }
 
 variable aws_private {
-  type = string
-}
-
-variable domains {
-  type = list
+  type = bool
+  default = false
 }
 
 variable aws_auth_user_mapping {
@@ -94,10 +114,6 @@ variable cert_manager_email {
 }
 
 variable kubernetes_version {
-  type = string
-}
-
-variable mainzoneid {
   type = string
 }
 
@@ -160,7 +176,7 @@ variable "rds_database_instance" {
 variable "rds_database_username" {
   type        = string
   description = "Database username"
-  default     = "exampleuser"
+  default     = "sa"
 }
 
 variable "rds_database_password" {
