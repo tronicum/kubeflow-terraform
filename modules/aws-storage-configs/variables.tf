@@ -48,3 +48,8 @@ variable s3_user_access_key {
     secret: ""
   }
 }
+
+variable module_depends_on {
+  type = list
+  default = []
+}

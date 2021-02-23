@@ -226,6 +226,9 @@ module "s3" {
 module "aws_storage" {
   source = "./modules/aws-storage-configs"
 
+  
+  module_depends_on = [module.kubernetes]
+
   s3_bucket_name = module.s3.s3_bucket_name
   cluster_name = var.cluster_name
   aws_region = var.aws_region
@@ -261,6 +264,7 @@ resource helm_release "reflector" {
 
 // Namespace for knative-serving
 resource "kubernetes_namespace" "knative_serving" {
+  depends_on = [module.kubernetes]
   metadata {
     labels = {
       "serving.knative.dev/release": "v0.14.3"
@@ -272,7 +276,7 @@ resource "kubernetes_namespace" "knative_serving" {
 
 // knative configmap to point to correct domain
 resource "kubernetes_config_map" "knative_config_map" {
-   depends_on = [kubernetes_namespace.knative_serving]
+  depends_on = [kubernetes_namespace.knative_serving]
   metadata {
     name = "config-domain"
     namespace = "knative-serving"

@@ -1,5 +1,6 @@
 
 resource "kubernetes_namespace" "mlflow" {
+  depends_on = [var.module_depends_on]
   metadata {
     labels = {
         "control-plane"   = "kubeflow"
@@ -11,6 +12,8 @@ resource "kubernetes_namespace" "mlflow" {
 }
 
 resource "kubernetes_namespace" "kubeflow" {
+  depends_on = [var.module_depends_on]
+  metadata {
   metadata {
     labels = {
         "control-plane"   = "kubeflow"
@@ -22,6 +25,8 @@ resource "kubernetes_namespace" "kubeflow" {
 
 
 resource "kubernetes_namespace" "pipelines" {
+  depends_on = [var.module_depends_on]
+  metadata {
   metadata {
     labels = {
         "control-plane"   = "kubeflow"
