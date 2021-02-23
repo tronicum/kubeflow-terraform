@@ -36,9 +36,6 @@ variable private_subnets {
 }
 
 
-
-
-
 variable aws_account {
   type = string
 }
@@ -65,11 +62,35 @@ variable argocd_branch {
 
 variable argocd_path_prefix {
   type = string
+  default = ""
 }
 
 variable argocd_apps_dir {
-  type = string
+  type    = string  
+  default = "apps"
 }
+
+variable argocd_vcs {
+  type = string
+  default = "github"
+}
+
+variable argocd_protocol {
+  type = string
+  default = "https"
+}
+
+variable argocd_repo_url {
+  type = string
+  default = ""
+}
+
+variable argocd_repo_ssh_private_key {
+  type = string
+  default = ""
+}
+
+
 
 variable kubeflow_manifests_branch {
   type = string

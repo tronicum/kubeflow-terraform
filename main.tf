@@ -306,14 +306,21 @@ resource "kubernetes_config_map" "knative_network_config_map" {
 
 // ArgoCD
 module argocd {
-  source        = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/cicd/argo-cd?ref=v1.0.1"
-  module_depends_on = [module.kubernetes]
-  branch        = var.argocd_branch
-  owner         = var.argocd_owner
-  repository    = var.argocd_repository
+  source                    = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/cicd/argo-cd?ref=feature/argocd_gitlab"
+  module_depends_on         = [module.kubernetes]
+  sync_branch               = var.argocd_branch
+  sync_owner                = var.argocd_owner
+  sync_repository           = var.argocd_repository
+  sync_path_prefix          = var.argocd_path_prefix
+  sync_apps_dir             = var.argocd_apps_dir
+  sync_vcs                  = var.argocd_vcs
+  sync_protocol             = var.argocd_protocol
+  sync_repo_url             = var.argocd_repo_url
+  sync_repo_ssh_private_key = var.argocd_repo_ssh_private_key
+
   cluster_name  = module.kubernetes.cluster_name
   domains       = [var.domain]
-  chart_version = "2.7.4"
+  helm_chart_version = "2.7.4"
   oidc = {
     secret = aws_cognito_user_pool_client.argocd.client_secret
     pool   = module.cognito.pool_id
@@ -328,8 +335,7 @@ module argocd {
       [{ "HTTPS" = 443 }]
     )
   }
-  path_prefix = var.argocd_path_prefix
-  apps_dir    = var.argocd_apps_dir
+
   tags        = var.tags
 }
 
