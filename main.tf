@@ -198,7 +198,7 @@ module "rds" {
 
 // Create S3 bucket
 module "s3" {
-  source            = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/storage/s3?ref=v1.0.0"
+  source            = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/storage/s3?ref=v1.0.2"
   module_depends_on = []
   s3_bucket_name    = "${var.aws_account}-${var.cluster_name}-kubeflow"
   cluster_name      = var.cluster_name
