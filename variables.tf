@@ -16,12 +16,9 @@ variable create_route_53_subdomain {
   default = true
 }
 
-
-
 variable domain {
   type = string
 }
-
 
 variable vpc_id {
   type = string
@@ -30,7 +27,7 @@ variable vpc_id {
 }
 
 variable private_subnets {
-  type = list
+  type = list(any)
   description = "A list of private subnets within the existing VPC"
   default = null
 }
@@ -57,7 +54,7 @@ variable argocd_path_prefix {
 }
 
 variable argocd_apps_dir {
-  type    = string  
+  type    = string
   default = "apps"
 }
 
@@ -104,7 +101,15 @@ variable kubeflow_profiles {
 }
 
 variable kubeflow_cognito_users {
-  type = list
+  description = "A mapping of users to groups, with unique hashes "
+  type = list(object({
+    username    = string
+    email       = string
+    group       = string //TODO current this entry will have no effect. All users are assigned to "default"
+    user_hash   = string // a unique has representation of the user. Must be alphanumeric and max 64 chars. For example sha("user@${username}").
+    user_group_hash = string // a unique has representation of the user. Must be alphanumeric and max 64 chars. For example sha("user-group@${username}"). Must differ from user_hash as each must be unique
+  }))
+  default = []
 }
 
 variable aws_private {
@@ -113,11 +118,23 @@ variable aws_private {
 }
 
 variable aws_auth_user_mapping {
-  type = list
+  description = "Additional IAM users to add to the aws-auth configmap."
+  type = list(object({
+    userarn  = string
+    username = string
+    groups   = list(string)
+  }))
+  default = []
 }
 
 variable aws_auth_role_mapping {
-  type = list
+  description = "Additional IAM ro9les to add to the aws-auth configmap."
+  type = list(object({
+    rolearn  = string
+    username = string
+    groups   = list(string)
+  }))
+  default = []
 }
 
 variable cert_manager_email {
@@ -139,7 +156,7 @@ variable cognito_callback_prefix_argocd {
 }
 
 variable availability_zones {
-  type = list
+  type = list(any)
 }
 
 variable kube2iam_role_arn {
