@@ -36,9 +36,6 @@ variable private_subnets {
 }
 
 
-
-
-
 variable aws_account {
   type = string
 }
@@ -50,26 +47,40 @@ variable cluster_name {
 variable aws_region {
   type = string
 }
-
-variable argocd_owner {
-  type = string
-}
-
-variable argocd_repository {
-  type = string
-}
-
 variable argocd_branch {
   type = string
 }
 
 variable argocd_path_prefix {
   type = string
+  default = ""
 }
 
 variable argocd_apps_dir {
-  type = string
+  type    = string  
+  default = "apps"
 }
+
+variable argocd_repo_url {
+  type = string
+  default = ""
+}
+
+variable argocd_repo_ssh_private_key {
+  type = string
+  default = ""
+}
+
+variable argocd_repo_https_username {
+  type = string
+  default = ""
+}
+
+variable argocd_repo_https_password {
+  type = string
+  default = ""
+}
+
 
 variable kubeflow_manifests_branch {
   type = string
