@@ -128,7 +128,7 @@ variable aws_auth_user_mapping {
 }
 
 variable aws_auth_role_mapping {
-  description = "Additional IAM ro9les to add to the aws-auth configmap."
+  description = "Additional IAM roles to add to the aws-auth configmap."
   type = list(object({
     rolearn  = string
     username = string
