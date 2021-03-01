@@ -380,9 +380,8 @@ module kfserving {
 module external_secrets {
   source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/system/external-secrets?ref=v1.0.3"
   argocd = module.argocd.state
+  cluster_output = module.kubernetes.cluster_output
 }
-
-
 
 
 // Create YAML specs for Kubeflow Operator and KFDef
