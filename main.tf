@@ -367,7 +367,7 @@ module mlflow {
 
   tags = var.tags
 
-  external_secrets_role_arn = external_secrets.external_secrets_role_arn
+  external_secrets_role_arn = module.external_secrets.external_secrets_role_arn
   
 
 }
