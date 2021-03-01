@@ -359,7 +359,7 @@ module mlflow {
   rds_host = module.rds.this_db_instance_address
   rds_port = module.rds.this_db_instance_port
 
-  db_name = local.db_names.mlflow
+  db_name = var.db_names.mlflow
 
   s3_bucket_name = module.s3.s3_bucket_name
 
