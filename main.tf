@@ -105,14 +105,14 @@ module kubernetes {
 
 
 locals {
-  loadbalancer_acm_arn = var.loadbalancer_acm_arn == "" ? module.acm.this_acm_certificate_arn : var.loadbalancer_acm_arn
+  loadbalancer_acm_arn = var.loadbalancer_acm_arn == "" ? module.acm[0].this_acm_certificate_arn : var.loadbalancer_acm_arn
 }
 module acm {
   source  = "terraform-aws-modules/acm/aws"
   version = "~> v2.0"
 
   
-  count = var.loadbalancer_acm_arn == "" ? 0 : 1 //only create if an existing ACM certificate hasn't been provided
+  count = var.loadbalancer_acm_arn == "" ? 1 : 0 //only create if an existing ACM certificate hasn't been provided
 
 
   domain_name               = var.domain
