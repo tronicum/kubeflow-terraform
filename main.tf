@@ -56,7 +56,7 @@ module kubernetes {
   aws_auth_role_mapping    = var.aws_auth_role_mapping
   wait_for_cluster_interpreter = ["/bin/bash", "-c"]
 
-  workers_additional_policies = [aws_iam_policy.worker_group_policy.arn]
+  workers_additional_policies = concat([aws_iam_policy.worker_group_policy.arn], var.workers_additional_policies)
   
   //spot
   spot_max_cluster_size  = 5
