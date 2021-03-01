@@ -45,6 +45,12 @@ variable private_subnets {
 }
 
 
+variable enable_irsa {
+  type        = bool
+  description = "Set to true to enable IAM Roles for Service Accounts"
+  default     = false
+}
+
 variable aws_account {
   type = string
 }

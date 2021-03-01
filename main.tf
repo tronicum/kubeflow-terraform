@@ -57,6 +57,9 @@ module kubernetes {
   wait_for_cluster_interpreter = ["/bin/bash", "-c"]
 
   workers_additional_policies = [aws_iam_policy.worker_group_policy.arn]
+
+  enable_irsa = var.enable_irsa
+
   
   //spot
   spot_max_cluster_size  = 5
