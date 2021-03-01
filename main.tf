@@ -365,6 +365,9 @@ module mlflow {
 
   cluster_name = module.kubernetes.cluster_name
 
+  tags = var.tags
+  
+
 }
 
 // Create YAML specs for Kubeflow Profiles
