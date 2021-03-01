@@ -363,6 +363,8 @@ module mlflow {
 
   s3_bucket_name = module.s3.s3_bucket_name
 
+  cluster_name = module.kubernetes.cluster_name
+
 }
 
 // Create YAML specs for Kubeflow Profiles
