@@ -352,8 +352,17 @@ module argocd {
 
 // Create YAML specs for MLFLow
 module mlflow {
-  source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/mlflow?ref=v1.0.3"
+  source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/mlflow?ref=feature/external_secrets"
   argocd = module.argocd.state
+  rds_username = module.rds.this_db_instance_username
+  rds_password = module.rds.this_db_instance_password  
+  rds_host = module.rds.this_db_instance_address
+  rds_port = module.rds.this_db_instance_port
+
+  db_name = local.db_names.mlflow
+
+  s3_bucket_name = module.s3.s3_bucket_name
+
 }
 
 // Create YAML specs for Kubeflow Profiles
