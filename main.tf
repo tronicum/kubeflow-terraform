@@ -104,9 +104,16 @@ module kubernetes {
 
 
 
+locals {
+  loadbalancer_acm_arn = var.loadbalancer_acm_arn == "" ? module.acm.this_acm_certificate_arn : var.loadbalancer_acm_arn
+}
 module acm {
   source  = "terraform-aws-modules/acm/aws"
   version = "~> v2.0"
+
+  
+  count = var.loadbalancer_acm_arn == "" ? 0 : 1 //only create if an existing ACM certificate hasn't been provided
+
 
   domain_name               = var.domain
   subject_alternative_names = ["*.${var.domain}"]
@@ -118,10 +125,11 @@ module acm {
 
 // Create Cognito User Pool
 module cognito {
-  source       = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/cognito/user-pool?ref=v1.0.2"
+  source       = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/cognito/user-pool?ref=feature/existing_acm"
   domain       = var.domain //TODO make "auth" parameterisable? Currently it is hardcode in the "cognito" module
   zone_id      = module.external_dns.zone_id
   cluster_name = module.kubernetes.cluster_name
+  acm_arn      = var.cognito_acm_arn
   tags         = var.tags
   invite_template = {
     email_subject = "You've been invited to https://${var.cognito_callback_prefix_kubeflow}.${var.domain}"
@@ -329,7 +337,7 @@ module argocd {
   ingress_annotations = {
     "kubernetes.io/ingress.class"               = "alb"
     "alb.ingress.kubernetes.io/scheme"          = "internet-facing"
-    "alb.ingress.kubernetes.io/certificate-arn" = module.acm.this_acm_certificate_arn
+    "alb.ingress.kubernetes.io/certificate-arn" = local.loadbalancer_acm_arn
     "alb.ingress.kubernetes.io/listen-ports" = jsonencode(
       [{ "HTTPS" = 443 }]
     )
@@ -376,7 +384,7 @@ module kubeflow {
   ingress_annotations = {
     "kubernetes.io/ingress.class"               = "alb"
     "alb.ingress.kubernetes.io/scheme"          = "internet-facing"
-    "alb.ingress.kubernetes.io/certificate-arn" = module.acm.this_acm_certificate_arn
+    "alb.ingress.kubernetes.io/certificate-arn" = local.loadbalancer_acm_arn
     "alb.ingress.kubernetes.io/auth-type"       = "cognito"
     "alb.ingress.kubernetes.io/auth-idp-cognito" = jsonencode({
       "UserPoolArn"      = module.cognito.pool_arn
@@ -506,7 +514,7 @@ module alb_ingress {
   cluster_name      = module.kubernetes.cluster_name
   domains           = [var.domain]
   vpc_id            = local.vpc_id
-  certificates_arns = [module.acm.this_acm_certificate_arn]
+  certificates_arns = [local.loadbalancer_acm_arn]
   argocd            = module.argocd.state
 }
 

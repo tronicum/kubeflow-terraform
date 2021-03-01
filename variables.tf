@@ -26,6 +26,18 @@ variable vpc_id {
   default = null
 }
 
+variable loadbalancer_acm_arn {
+  type = string
+  description = "The ARN of an ACM certificate to attach to the Load Balancer"
+  default = ""
+}
+
+variable cognito_acm_arn {
+  type = string
+  description = "The ARN of an ACM certificate to attach to the Cognito App Domain (must be in us-east-1)"
+  default = ""
+}
+
 variable private_subnets {
   type = list(any)
   description = "A list of private subnets within the existing VPC"
