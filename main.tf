@@ -44,7 +44,7 @@ EOF
 
 // Kubernetes Cluster
 module kubernetes {
-  source             = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/kubernetes?ref=v1.0.3"
+  source             = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/kubernetes?ref=feature/external_secrets"
   availability_zones = var.availability_zones
   environment        = var.environment
   project            = var.project
