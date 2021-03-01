@@ -290,3 +290,9 @@ variable "rds_publicly_accessible" {
   default = false
   type    = bool
 }
+
+variable "workers_additional_policies" {
+  type  = list
+  default = []
+  description = "List of ARNs of additional policies to attach to workers"
+}
