@@ -366,6 +366,8 @@ module mlflow {
   cluster_name = module.kubernetes.cluster_name
 
   tags = var.tags
+
+  external_secrets_role_arn = external_secrets.external_secrets_role_arn
   
 
 }
