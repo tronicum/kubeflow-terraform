@@ -57,7 +57,13 @@ variable enable_secret_encryption {
   default     = false
 }
 
-
+variable "secret_manager_full_access" {
+  default     = false
+  description = <<EOT
+  By setting this to true, the assumable role that is created for the Service Account attached to the External-Secrets application will have full access to all AWS Sercret Manager keys prefixed the name of the cluster. 
+  We recommend setting this to false and instead creating roles with fine-granular access policies for each ExternalSecret you define, and allow the role created here to assume those roles.
+  EOT
+}
 variable aws_account {
   type = string
 }

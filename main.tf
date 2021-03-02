@@ -404,7 +404,7 @@ module external_secrets {
 
   // Set to false create and attach role to external_secrets service account that has no policies attached to it. This role will then be used to assume other role with fine granular access. This is the recommended approach
   // Set to true to with the external_secrets service account full access to all secrets prefixed with the cluster name. This is more convenient but less secure.
-  secret_manager_full_access = false
+  secret_manager_full_access = var.secret_manager_full_access
 }
 
 
