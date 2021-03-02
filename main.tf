@@ -371,8 +371,8 @@ module mlflow {
 
   tags = var.tags
 
-  external_secrets_role_arn = module.external_secrets.external_secrets_role_arn
-  
+  external_secrets_deployment_role_arn = module.external_secrets.external_secrets_role_arn
+  //external_secrets_secret_role_arn = module.external_secrets.external_secrets_role_arn
 
 }
 
@@ -401,6 +401,10 @@ module external_secrets {
   source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/system/external-secrets?ref=feature/external_secrets"
   argocd = module.argocd.state
   cluster_output = module.kubernetes.cluster_output
+
+  // Set to false create and attach role to external_secrets service account that has no policies attached to it. This role will then be used to assume other role with fine granular access. This is the recommended approach
+  // Set to true to with the external_secrets service account full access to all secrets prefixed with the cluster name. This is more convenient but less secure.
+  secret_manager_full_access = false
 }
 
 
