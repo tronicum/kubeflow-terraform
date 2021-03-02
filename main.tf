@@ -234,44 +234,6 @@ module "s3" {
 ////  Kubernetes Resources
 
 
-// AWS Storage ConfigMaps and Secrets
-module "aws_storage" {
-  source = "./modules/aws-storage-configs"
-
-  
-  module_depends_on = [module.kubernetes]
-
-  s3_bucket_name = module.s3.s3_bucket_name
-  cluster_name = var.cluster_name
-  aws_region = var.aws_region
-  db_names = var.db_names
-
-  rds_host = module.rds.this_db_instance_address
-  rds_port = module.rds.this_db_instance_port
-  rds_username = module.rds.this_db_instance_username
-  rds_password = module.rds.this_db_instance_password
-
-  namespaces = join(",",[for profile in var.kubeflow_profiles: profile.namespace])
-
-  role_to_assume_arn = module.s3.s3_role_arn
-  s3_user_access_key = module.s3.s3_user_access_key
-}
-
-
-
-//this is used to "reflect" secrets and config maps. We need this work secrets/configs that are needed in each user namespace
-resource helm_release "reflector" {
-  depends_on = [module.kubernetes]
-
-  name          = "reflector"
-  repository    = "https://emberstack.github.io/helm-charts"
-  chart         = "reflector"
-  version       = "5.4.17"
-  namespace     = "kube-system"
-  recreate_pods = true
-  timeout       = 1200
-}
-
 
 
 // Namespace for knative-serving
