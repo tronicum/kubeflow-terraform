@@ -60,10 +60,18 @@ variable enable_secret_encryption {
 variable "secret_manager_full_access" {
   default     = false
   description = <<EOT
-  By setting this to true, the assumable role that is created for the Service Account attached to the External-Secrets application will have full access to all AWS Sercret Manager keys prefixed the name of the cluster. 
+  By setting this to true, the assumable role that is created for the Service Account attached to the External-Secrets application will have full access to all AWS Secret Manager keys prefixed the name of the cluster. 
   We recommend setting this to false and instead creating roles with fine-granular access policies for each ExternalSecret you define, and allow the role created here to assume those roles.
   EOT
 }
+variable "secret_manager_assume_from_node_role" {
+  default     = false
+  description = <<EOT
+  By setting this to true, we assume that the External-Secrets application will start with the Worker Nodes Role (i.e. the roll that is available to all pods in the cluster). This should be used if IRSA has not yet been activated, so that
+  the External-Secrets application cannot be started with a specific role. From here, the Worker Node roll should be set to be assumable by the rolls that have access to the external secrets.
+  EOT
+}
+
 variable aws_account {
   type = string
 }
