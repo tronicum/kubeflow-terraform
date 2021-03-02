@@ -411,6 +411,10 @@ module external_secrets {
 // Create YAML specs for Kubeflow Operator and KFDef
 module kubeflow {
   source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/kubeflow-operator?ref=feature/external_secrets"
+
+   external_secrets_deployment_role_arn = module.external_secrets.external_secrets_role_arn
+  //external_secrets_secret_role_arn = module.external_secrets.external_secrets_role_arn
+
   ingress_annotations = {
     "kubernetes.io/ingress.class"               = "alb"
     "alb.ingress.kubernetes.io/scheme"          = "internet-facing"
