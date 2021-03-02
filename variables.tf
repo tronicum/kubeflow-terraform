@@ -51,6 +51,13 @@ variable enable_irsa {
   default     = false
 }
 
+variable enable_secret_encryption {
+  type        = bool
+  description = "Set to true to create a KMS key to be used as a CMK (Cluster Master Key) for secret encryption"
+  default     = false
+}
+
+
 variable aws_account {
   type = string
 }

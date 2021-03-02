@@ -59,6 +59,7 @@ module kubernetes {
   workers_additional_policies = [aws_iam_policy.worker_group_policy.arn]
 
   enable_irsa = var.enable_irsa
+  enable_secret_encryption = var.enable_secret_encryption
 
   
   //spot
