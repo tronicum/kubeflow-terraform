@@ -1,7 +1,7 @@
 
 module network {
   count = var.vpc_id == null ? 1 : 0
-  source             = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/network?ref=v1.0.3"
+  source             = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/network?ref=v1.0.6"
   availability_zones = var.availability_zones
   environment        = var.environment
   project            = var.project
@@ -44,7 +44,7 @@ EOF
 
 // Kubernetes Cluster
 module kubernetes {
-  source             = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/kubernetes?ref=v1.0.3"
+  source             = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/kubernetes?ref=v1.0.6"
   availability_zones = var.availability_zones
   environment        = var.environment
   project            = var.project
@@ -55,6 +55,9 @@ module kubernetes {
   aws_auth_user_mapping    = var.aws_auth_user_mapping
   aws_auth_role_mapping    = var.aws_auth_role_mapping
   wait_for_cluster_interpreter = ["/bin/bash", "-c"]
+
+  enable_irsa = var.enable_irsa
+  enable_secret_encryption = var.enable_secret_encryption
 
   workers_additional_policies = concat([aws_iam_policy.worker_group_policy.arn], var.workers_additional_policies)
   
@@ -125,7 +128,7 @@ module acm {
 
 // Create Cognito User Pool
 module cognito {
-  source       = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/cognito/user-pool?ref=v1.0.3"
+  source       = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/cognito/user-pool?ref=v1.0.6"
   domain       = var.domain //TODO make "auth" parameterisable? Currently it is hardcode in the "cognito" module
   zone_id      = module.external_dns.zone_id
   cluster_name = module.kubernetes.cluster_name
@@ -172,7 +175,7 @@ resource aws_cognito_user_pool_client argocd {
 
 // Create Cognito Users
 module cognito_users {
-  source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/cognito/users?ref=v1.0.3"
+  source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/cognito/users?ref=v1.0.6"
   cloudformation_stack_name = "${var.cluster_name}-cognito-users"
   pool_id  = module.cognito.pool_id
   user_groups = ["default"] //TODO
@@ -183,7 +186,7 @@ module cognito_users {
 
 // Create RDS instance
 module "rds" {
-  source  = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/rds?ref=v1.0.3"
+  source  = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/rds?ref=v1.0.6"
 
   environment  = var.environment
   project      = var.project
@@ -215,7 +218,7 @@ module "rds" {
 
 // Create S3 bucket
 module "s3" {
-  source            = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/storage/s3?ref=v1.0.3"
+  source            = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/storage/s3?ref=v1.0.6"
   module_depends_on = []
   s3_bucket_name    = "${var.aws_account}-${var.cluster_name}-kubeflow"
   cluster_name      = var.cluster_name
@@ -229,44 +232,6 @@ module "s3" {
 
 ////  Kubernetes Resources
 
-
-// AWS Storage ConfigMaps and Secrets
-module "aws_storage" {
-  source = "./modules/aws-storage-configs"
-
-  
-  module_depends_on = [module.kubernetes]
-
-  s3_bucket_name = module.s3.s3_bucket_name
-  cluster_name = var.cluster_name
-  aws_region = var.aws_region
-  db_names = var.db_names
-
-  rds_host = module.rds.this_db_instance_address
-  rds_port = module.rds.this_db_instance_port
-  rds_username = module.rds.this_db_instance_username
-  rds_password = module.rds.this_db_instance_password
-
-  namespaces = join(",",[for profile in var.kubeflow_profiles: profile.namespace])
-
-  role_to_assume_arn = module.s3.s3_role_arn
-  s3_user_access_key = module.s3.s3_user_access_key
-}
-
-
-
-//this is used to "reflect" secrets and config maps. We need this work secrets/configs that are needed in each user namespace
-resource helm_release "reflector" {
-  depends_on = [module.kubernetes]
-
-  name          = "reflector"
-  repository    = "https://emberstack.github.io/helm-charts"
-  chart         = "reflector"
-  version       = "5.4.17"
-  namespace     = "kube-system"
-  recreate_pods = true
-  timeout       = 1200
-}
 
 
 
@@ -314,7 +279,7 @@ resource "kubernetes_config_map" "knative_network_config_map" {
 
 // ArgoCD
 module argocd {
-  source                    = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/cicd/argo-cd?ref=v1.0.3"
+  source                    = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/cicd/argo-cd?ref=v1.0.6"
   module_depends_on         = [module.kubernetes]
   sync_branch               = var.argocd_branch
   sync_path_prefix          = var.argocd_path_prefix
@@ -352,35 +317,83 @@ module argocd {
 
 // Create YAML specs for MLFLow
 module mlflow {
-  source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/mlflow?ref=v1.0.3"
+  source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/mlflow?ref=v1.0.6"
   argocd = module.argocd.state
+  rds_username = module.rds.this_db_instance_username
+  rds_password = module.rds.this_db_instance_password  
+  rds_host = module.rds.this_db_instance_address
+  rds_port = module.rds.this_db_instance_port
+
+  db_name = var.db_name_mlflow
+
+  s3_bucket_name = module.s3.s3_bucket_name
+
+  cluster_name = module.kubernetes.cluster_name
+
+  tags = var.tags
+
+  external_secrets_deployment_role_arn = local.external_secrets_deployment_role_arn
+  //external_secrets_secret_role_arn = module.external_secrets.external_secrets_role_arn
+
 }
 
 // Create YAML specs for Kubeflow Profiles
 module profiles {
-  source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/kubeflow-profiles?ref=v1.0.3"
+  source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/kubeflow-profiles?ref=v1.0.6"
   argocd = module.argocd.state
   profiles = var.kubeflow_profiles
 }
 
 // Create YAML specs for kube2iam
 module kube2iam {
-  source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/system/kube2iam?ref=v1.0.3"
+  source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/system/kube2iam?ref=v1.0.6"
   argocd = module.argocd.state
   base_role_arn = var.kube2iam_role_arn
 }
 
 // Create YAML specs for KFServing
 module kfserving {
-  source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/kfserving/0-3-0/?ref=v1.0.3"
+  source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/kfserving/0-3-0/?ref=v1.0.6"
   argocd = module.argocd.state
 }
 
+// Create YAML specs for External-Secrets
+module external_secrets {
+  source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/system/external-secrets?ref=v1.0.6"
+  argocd = module.argocd.state  
+  cluster_name = var.cluster_name
+
+  // Set to false create and attach role to external_secrets service account that has no policies attached to it. This role will then be used to assume other role with fine granular access. This is the recommended approach
+  // Set to true to with the external_secrets service account full access to all secrets prefixed with the cluster name. This is more convenient but less secure.
+  secret_manager_full_access = var.secret_manager_full_access
+}
 
 
 // Create YAML specs for Kubeflow Operator and KFDef
 module kubeflow {
-  source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/kubeflow-operator?ref=v1.0.3"
+  source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/kubeflow-operator?ref=v1.0.6"
+  rds_username = module.rds.this_db_instance_username
+  rds_password = module.rds.this_db_instance_password  
+  rds_host = module.rds.this_db_instance_address
+  rds_port = module.rds.this_db_instance_port
+
+  db_name_pipelines = var.db_name_pipelines
+  db_name_katib = var.db_name_katib
+  db_name_cache = var.db_name_cache
+  db_name_metadata = var.db_name_metadata
+
+  pipelines_role_to_assume_role_arn = module.s3.s3_role_arn //TODO, must set up pipelines serviceaccount to be able to assume this role!
+
+  s3_bucket_name = module.s3.s3_bucket_name
+  s3_user_access_key = module.s3.s3_user_access_key
+
+  cluster_name = module.kubernetes.cluster_name
+
+  tags = var.tags
+
+  external_secrets_deployment_role_arn = local.external_secrets_deployment_role_arn
+  //external_secrets_secret_role_arn = module.external_secrets.external_secrets_role_arn
+
   ingress_annotations = {
     "kubernetes.io/ingress.class"               = "alb"
     "alb.ingress.kubernetes.io/scheme"          = "internet-facing"
@@ -484,7 +497,7 @@ EOT
 
 // Create YAML specs for Cluster Autoscaler
 module cluster_autoscaler {
-  source            = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/system/cluster-autoscaler?ref=v1.0.3"
+  source            = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/system/cluster-autoscaler?ref=v1.0.6"
   image_tag         = "v1.15.7"
   cluster_name      = module.kubernetes.cluster_name
   module_depends_on = [module.kubernetes]
@@ -495,7 +508,7 @@ module cluster_autoscaler {
 // Create YAML specs for Certificate Manager
 module cert_manager {
   module_depends_on = [module.kubernetes]
-  source            = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/system/cert-manager?ref=v1.0.3"
+  source            = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/system/cert-manager?ref=v1.0.6"
   cluster_name      = module.kubernetes.cluster_name
   domains           = [var.domain]
   vpc_id            = local.vpc_id
@@ -510,7 +523,7 @@ module cert_manager {
 // Create YAML specs for ALB Ingress
 module alb_ingress {
   module_depends_on = [module.kubernetes]
-  source            = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/ingress/aws-alb?ref=v1.0.3"
+  source            = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/ingress/aws-alb?ref=v1.0.6"
   cluster_name      = module.kubernetes.cluster_name
   domains           = [var.domain]
   vpc_id            = local.vpc_id
@@ -520,7 +533,7 @@ module alb_ingress {
 
 // Create YAML specs for External DNS
 module external_dns {
-  source       = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/system/external-dns?ref=v1.0.3"
+  source       = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/system/external-dns?ref=v1.0.6"
   cluster_name = module.kubernetes.cluster_name
   vpc_id       = local.vpc_id
   aws_private  = var.aws_private

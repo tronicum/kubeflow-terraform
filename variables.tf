@@ -45,6 +45,33 @@ variable private_subnets {
 }
 
 
+variable enable_irsa {
+  type        = bool
+  description = "Set to true to enable IAM Roles for Service Accounts"
+  default     = false
+}
+
+variable enable_secret_encryption {
+  type        = bool
+  description = "Set to true to create a KMS key to be used as a CMK (Cluster Master Key) for secret encryption"
+  default     = false
+}
+
+variable "secret_manager_full_access" {
+  default     = false
+  description = <<EOT
+  By setting this to true, the assumable role that is created for the Service Account attached to the External-Secrets application will have full access to all AWS Secret Manager keys prefixed the name of the cluster. 
+  We recommend setting this to false and instead creating roles with fine-granular access policies for each ExternalSecret you define, and allow the role created here to assume those roles.
+  EOT
+}
+variable "secret_manager_assume_from_node_role" {
+  default     = false
+  description = <<EOT
+  By setting this to true, we assume that the External-Secrets application will start with the Worker Nodes Role (i.e. the roll that is available to all pods in the cluster). This should be used if IRSA has not yet been activated, so that
+  the External-Secrets application cannot be started with a specific role. From here, the Worker Node roll should be set to be assumable by the rolls that have access to the external secrets.
+  EOT
+}
+
 variable aws_account {
   type = string
 }
@@ -99,8 +126,33 @@ variable kubeflow_manifests_release {
   type = string
 }
 
-variable db_names {
-  type = map(string)
+variable db_name_mlflow {
+  type = string
+  description = "Name of the database on the RDS instance that is used for mlflow"
+  default = "mlflow"
+}
+variable db_name_pipelines {
+  type = string
+  description = "Name of the database on the RDS instance that is used for pipelines"
+  default = "mlpipeline"
+}
+
+variable db_name_cache{
+  type = string
+  description = "Name of the database on the RDS instance that is used for cache"
+  default = "cachedb"
+}
+
+variable db_name_metadata {
+  type = string
+  description = "Name of the database on the RDS instance that is used for metadata"
+  default = "metadb"
+}
+
+variable db_name_katib {
+  type = string
+  description = "Name of the database on the RDS instance that is used for katib"
+  default = "katib"
 }
 
 
