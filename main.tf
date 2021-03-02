@@ -361,8 +361,8 @@ module kfserving {
 // Create YAML specs for External-Secrets
 module external_secrets {
   source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/system/external-secrets?ref=feature/external_secrets"
-  argocd = module.argocd.state
-  cluster_output = module.kubernetes.cluster_output
+  argocd = module.argocd.state  
+  cluster_name = var.cluster_name
 
   // Set to false create and attach role to external_secrets service account that has no policies attached to it. This role will then be used to assume other role with fine granular access. This is the recommended approach
   // Set to true to with the external_secrets service account full access to all secrets prefixed with the cluster name. This is more convenient but less secure.
