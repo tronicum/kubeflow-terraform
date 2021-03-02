@@ -325,7 +325,7 @@ module mlflow {
   rds_host = module.rds.this_db_instance_address
   rds_port = module.rds.this_db_instance_port
 
-  db_name = var.db_names.mlflow
+  db_name = var.db_name_mlflow
 
   s3_bucket_name = module.s3.s3_bucket_name
 
@@ -373,8 +373,23 @@ module external_secrets {
 // Create YAML specs for Kubeflow Operator and KFDef
 module kubeflow {
   source = "git::https://github.com/at-gmbh/swiss-army-kube.git//modules/kubeflow-operator?ref=feature/external_secrets"
+  rds_username = module.rds.this_db_instance_username
+  rds_password = module.rds.this_db_instance_password  
+  rds_host = module.rds.this_db_instance_address
+  rds_port = module.rds.this_db_instance_port
 
-   external_secrets_deployment_role_arn = module.external_secrets.external_secrets_role_arn
+  db_name_pipelines = var.db_name_pipelines
+  db_name_katib = var.db_name_katib
+  db_name_cache = var.db_name_cache
+  db_name_metadata = var.db_name_metadata
+
+  s3_bucket_name = module.s3.s3_bucket_name
+
+  cluster_name = module.kubernetes.cluster_name
+
+  tags = var.tags
+
+  external_secrets_deployment_role_arn = module.external_secrets.external_secrets_role_arn
   //external_secrets_secret_role_arn = module.external_secrets.external_secrets_role_arn
 
   ingress_annotations = {
