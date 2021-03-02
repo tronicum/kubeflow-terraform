@@ -386,6 +386,7 @@ module kubeflow {
   pipelines_role_to_assume_role_arn = module.s3.s3_role_arn //TODO, must set up pipelines serviceaccount to be able to assume this role!
 
   s3_bucket_name = module.s3.s3_bucket_name
+  s3_user_access_key = module.s3.s3_user_access_key
 
   cluster_name = module.kubernetes.cluster_name
 
